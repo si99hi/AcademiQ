@@ -10,7 +10,12 @@ const userSchema = new mongoose.Schema({
   enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   createdAt: { type: Date, default: Date.now },
   lastLogin: { type: Date },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
+  isVerified: { type: Boolean, default: false },
+  verificationOtp: { type: String },
+  verificationOtpExpire: { type: Date },
+  resetPasswordOtp: { type: String },
+  resetPasswordExpire: { type: Date }
 });
 
 const User = mongoose.model('User', userSchema);
