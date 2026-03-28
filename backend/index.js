@@ -24,10 +24,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+const dbName = process.env.MONGO_DB || "localhost2027";
+const mongoUri = `mongodb://127.0.0.1:27017/${dbName}`;
+
+mongoose.connect(mongoUri)
 .then(() => {
   console.log('MongoDB connected successfully ✅');
   app.listen(PORT, () => {
