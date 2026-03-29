@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, Medal, Award } from "lucide-react"
 
 const topStudents = [
@@ -7,51 +6,80 @@ const topStudents = [
   { id: 3, name: "Vikram Singh", score: 965, rank: 3 },
 ]
 
+const rankIcons = [
+  <Trophy key={1} size={18} style={{ color: "#f5c518" }} />,
+  <Medal key={2} size={18} style={{ color: "#adb5bd" }} />,
+  <Award key={3} size={18} style={{ color: "#cd7f32" }} />,
+]
+
 export default function MiniLeaderboard() {
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-primary text-white pb-3">
-        <CardTitle className="text-lg flex items-center">
-          <Trophy className="mr-2" size={18} />
+    <div className="bg-white shadow-sm overflow-hidden">
+      {/* Navy header */}
+      <div className="px-5 py-4" style={{ background: "#0d1b3e" }}>
+        <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: "#f5c518", fontFamily: "'Barlow Condensed', sans-serif" }}>
+          TOP PERFORMERS
+        </p>
+        <h3 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, fontSize: "1.15rem", color: "#fff" }}>
           Leaderboard
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="divide-y">
-          {topStudents.map((student) => (
-            <div key={student.id} className="flex items-center p-3 hover:bg-secondary/50 transition-colors">
-              <div className="w-8 h-8 flex items-center justify-center mr-3">
-                {student.rank === 1 ? (
-                  <Trophy className="text-yellow-500" size={20} />
-                ) : student.rank === 2 ? (
-                  <Medal className="text-gray-400" size={20} />
-                ) : (
-                  <Award className="text-amber-700" size={20} />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">{student.name}</p>
-                <p className="text-xs text-muted-foreground">Score: {student.score}</p>
-              </div>
-              <div className="text-sm font-bold text-primary">#{student.rank}</div>
+        </h3>
+      </div>
+
+      {/* Gold bar */}
+      <div className="h-0.5" style={{ background: "#f5c518" }} />
+
+      {/* Students */}
+      <div className="divide-y divide-gray-100">
+        {topStudents.map((student, i) => (
+          <div key={student.id} className="flex items-center px-5 py-3.5 hover:bg-gray-50 transition-colors">
+            {/* Rank icon */}
+            <div className="w-8 flex-shrink-0 flex items-center justify-center">
+              {rankIcons[i]}
             </div>
-          ))}
-        </div>
-        <div className="p-3 bg-secondary/50 border-t">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">Your Rank</p>
-              <p className="text-xs text-muted-foreground">Score: 820</p>
+
+            {/* Avatar initial */}
+            <div
+              className="w-8 h-8 flex-shrink-0 flex items-center justify-center text-xs font-bold text-white mr-3"
+              style={{ background: "#1a2d5a", fontFamily: "'Barlow Condensed', sans-serif" }}
+            >
+              {student.name.charAt(0)}
             </div>
-            <div className="text-sm font-bold text-primary">#42</div>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 truncate">{student.name}</p>
+              <p className="text-xs text-gray-400">Score: {student.score}</p>
+            </div>
+
+            <div
+              className="text-sm font-extrabold"
+              style={{ color: "#f5c518", fontFamily: "'Barlow Condensed', sans-serif", fontSize: "1rem" }}
+            >
+              #{student.rank}
+            </div>
           </div>
-          <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-full bg-primary/80" style={{ width: "79%" }}></div>
+        ))}
+      </div>
+
+      {/* Your rank */}
+      <div className="px-5 py-4" style={{ background: "#f5f6f8", borderTop: "2px solid #0d1b3e" }}>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Your Rank</p>
+            <p className="text-xs text-gray-400">Score: 820</p>
           </div>
-          <p className="text-xs text-right mt-1 text-muted-foreground">Top 21%</p>
+          <div
+            className="text-lg font-extrabold"
+            style={{ color: "#0d1b3e", fontFamily: "'Barlow Condensed', sans-serif" }}
+          >
+            #42
+          </div>
         </div>
-      </CardContent>
-    </Card>
+        {/* Progress bar */}
+        <div className="h-2 bg-gray-200 overflow-hidden">
+          <div className="h-full transition-all duration-700" style={{ width: "79%", background: "#f5c518" }} />
+        </div>
+        <p className="text-[10px] text-right mt-1 text-gray-400 font-semibold uppercase tracking-wider">Top 21%</p>
+      </div>
+    </div>
   )
 }
-

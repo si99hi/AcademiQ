@@ -8,44 +8,49 @@ import { ChevronLeft, Video, FileText, PenTool } from "lucide-react"
 
 
 // Define the subject data
+// ──────────────────────────────────────────────────────────────────────────────
+// TO ADD PDFs: put your PDF files inside  public/pdfs/<subject>/<filename>.pdf
+// then update the `pdf` field below to match the filename.
+// Example: public/pdfs/physics/mechanics.pdf  →  pdf: "/pdfs/physics/mechanics.pdf"
+// ──────────────────────────────────────────────────────────────────────────────
 const subjects = {
   physics: {
     name: "Physics",
     description: "Master the fundamental laws of the physical world",
     chapters: [
-      { id: 1, title: "Mechanics", completed: true },
-      { id: 2, title: "Thermodynamics", completed: true },
-      { id: 3, title: "Electrostatics", completed: false },
-      { id: 4, title: "Current Electricity", completed: false },
-      { id: 5, title: "Magnetism", completed: false },
-      { id: 6, title: "Optics", completed: false },
-      { id: 7, title: "Modern Physics", completed: false },
+      { id: 1, title: "Mechanics",         completed: true,  pdf: "/pdfs/physics/mechanics.pdf" },
+      { id: 2, title: "Thermodynamics",    completed: true,  pdf: "/pdfs/physics/thermodynamics.pdf" },
+      { id: 3, title: "Electrostatics",    completed: false, pdf: "/pdfs/physics/electrostatics.pdf" },
+      { id: 4, title: "Current Electricity", completed: false, pdf: "/pdfs/physics/current-electricity.pdf" },
+      { id: 5, title: "Magnetism",         completed: false, pdf: "/pdfs/physics/magnetism.pdf" },
+      { id: 6, title: "Optics",            completed: false, pdf: "/pdfs/physics/optics.pdf" },
+      { id: 7, title: "Modern Physics",    completed: false, pdf: "/pdfs/physics/modern-physics.pdf" },
     ],
   },
   chemistry: {
     name: "Chemistry",
     description: "Explore the composition, structure, and properties of matter",
     chapters: [
-      { id: 1, title: "Atomic Structure", completed: true },
-      { id: 2, title: "Chemical Bonding", completed: true },
-      { id: 3, title: "States of Matter", completed: false },
-      { id: 4, title: "Thermodynamics", completed: false },
-      { id: 5, title: "Equilibrium", completed: false },
-      { id: 6, title: "Organic Chemistry", completed: false },
-      { id: 7, title: "Inorganic Chemistry", completed: false },
+      { id: 1, title: "Atomic Structure",    completed: true,  pdf: "/pdfs/chemistry/atomic-structure.pdf" },
+      { id: 2, title: "Chemical Bonding",    completed: true,  pdf: "/pdfs/chemistry/chemical-bonding.pdf" },
+      { id: 3, title: "States of Matter",    completed: false, pdf: "/pdfs/chemistry/states-of-matter.pdf" },
+      { id: 4, title: "Thermodynamics",      completed: false, pdf: "/pdfs/chemistry/thermodynamics.pdf" },
+      { id: 5, title: "Equilibrium",         completed: false, pdf: "/pdfs/chemistry/equilibrium.pdf" },
+      { id: 6, title: "Organic Chemistry",   completed: false, pdf: "/pdfs/chemistry/organic-chemistry.pdf" },
+      { id: 7, title: "Inorganic Chemistry", completed: false, pdf: "/pdfs/chemistry/inorganic-chemistry.pdf" },
     ],
   },
   mathematics: {
     name: "Mathematics",
     description: "Develop problem-solving skills with advanced mathematical concepts",
     chapters: [
-      { id: 1, title: "Algebra", completed: true },
-      { id: 2, title: "Calculus", completed: true },
-      { id: 3, title: "Coordinate Geometry", completed: false },
-      { id: 4, title: "Trigonometry", completed: false },
-      { id: 5, title: "Vectors", completed: false },
-      { id: 6, title: "Probability", completed: false },
-      { id: 7, title: "Statistics", completed: false },
+      { id: 1, title: "Algebra",              completed: true,  pdf: "/pdfs/mathematics/algebra.pdf" },
+      { id: 2, title: "Calculus",             completed: true,  pdf: "/pdfs/mathematics/calculus.pdf" },
+      { id: 3, title: "Coordinate Geometry",  completed: false, pdf: "/pdfs/mathematics/coordinate-geometry.pdf" },
+      { id: 4, title: "Trigonometry",         completed: false, pdf: "/pdfs/mathematics/trigonometry.pdf" },
+      { id: 5, title: "Vectors",              completed: false, pdf: "/pdfs/mathematics/vectors.pdf" },
+      { id: 6, title: "Probability",          completed: false, pdf: "/pdfs/mathematics/probability.pdf" },
+      { id: 7, title: "Statistics",           completed: false, pdf: "/pdfs/mathematics/statistics.pdf" },
     ],
   },
 }
@@ -147,20 +152,25 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                           Comprehensive study material with examples and practice problems
                         </p>
                         <div className="flex gap-2 mt-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-primary border-primary/30 hover:bg-secondary"
+                          {/* VIEW — opens PDF in browser */}
+                          <a
+                            href={chapter.pdf}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-3 py-1.5 text-xs font-bold uppercase tracking-wider border-2 transition-all hover:opacity-80"
+                            style={{ borderColor: "#f5c518", color: "#0d1b3e", fontFamily: "'Barlow Condensed', sans-serif" }}
                           >
                             View
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-primary border-primary/30 hover:bg-secondary"
+                          </a>
+                          {/* DOWNLOAD — forces browser to download the file */}
+                          <a
+                            href={chapter.pdf}
+                            download
+                            className="inline-flex items-center px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all hover:opacity-80"
+                            style={{ background: "#f5c518", color: "#0d1b3e", fontFamily: "'Barlow Condensed', sans-serif" }}
                           >
-                            Download PDF
-                          </Button>
+                            Download PDF ↓
+                          </a>
                         </div>
                       </div>
                     ))}

@@ -1,76 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 20% 8%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 8%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 8%;
+    /* EDUMINT Navy+Gold scheme */
+    --background: 0 0% 97%;
+    --foreground: 220 60% 8%;
 
-    --primary: 220 90% 50%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 214 80% 95%;
-    --secondary-foreground: 220 70% 25%;
-    --muted: 214 60% 96%;
-    --muted-foreground: 220 15% 45%;
-    --accent: 214 70% 93%;
-    --accent-foreground: 220 70% 25%;
-    --destructive: 0 84.2% 60.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 60% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 60% 8%;
+
+    /* Primary = gold/yellow accent */
+    --primary: 46 95% 53%;
+    --primary-foreground: 220 60% 8%;
+
+    /* Secondary = navy */
+    --secondary: 224 70% 16%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 220 15% 92%;
+    --muted-foreground: 220 10% 45%;
+
+    --accent: 46 95% 53%;
+    --accent-foreground: 220 60% 8%;
+
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 40% 88%;
-    --input: 214 40% 88%;
-    --ring: 220 90% 50%;
-    --radius: 0.5rem;
+
+    --border: 220 20% 86%;
+    --input: 220 20% 86%;
+    --ring: 46 95% 53%;
+
+    /* SHARP EDGES — no radius anywhere */
+    --radius: 0rem;
   }
 
   .dark {
-    --background: 222 47% 6%;
+    --background: 224 70% 8%;
     --foreground: 0 0% 95%;
-    --card: 222 40% 10%;
+    --card: 224 60% 12%;
     --card-foreground: 0 0% 95%;
-    --popover: 222 40% 9%;
+    --popover: 224 60% 11%;
     --popover-foreground: 0 0% 95%;
-    --primary: 220 85% 58%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 40% 16%;
+    --primary: 46 95% 53%;
+    --primary-foreground: 224 70% 8%;
+    --secondary: 224 50% 20%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 220 30% 14%;
+    --muted: 224 40% 16%;
     --muted-foreground: 220 10% 65%;
-    --accent: 220 40% 16%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 220 35% 16%;
-    --input: 220 35% 16%;
-    --ring: 220 85% 58%;
+    --accent: 46 95% 53%;
+    --accent-foreground: 224 70% 8%;
+    --destructive: 0 62% 31%;
+    --destructive-foreground: 0 85% 97%;
+    --border: 224 35% 20%;
+    --input: 224 35% 20%;
+    --ring: 46 95% 53%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    border-radius: 0 !important;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, .heading {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
 }
 
+/* ── EDUMINT custom utilities ── */
+@layer components {
+  .btn-gold {
+    @apply bg-[#f5c518] text-[#0d1b3e] font-bold uppercase tracking-wider px-6 py-3 transition-all duration-200 hover:bg-yellow-400 hover:shadow-lg;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+  }
+
+  .btn-navy-outline {
+    @apply border-2 border-white text-white font-bold uppercase tracking-wider px-6 py-3 transition-all duration-200 hover:bg-white hover:text-[#0d1b3e];
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+  }
+
+  .section-label {
+    @apply text-[#f5c518] text-xs font-bold uppercase tracking-[0.2em] flex items-center gap-2;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  .section-label::after {
+    content: '';
+    @apply inline-block w-10 h-0.5 bg-[#f5c518];
+  }
+
+  .navy-card {
+    @apply bg-[#0d1b3e] text-white border-0;
+  }
+
+  .gold-accent-bar {
+    @apply border-l-4 border-[#f5c518] pl-4;
+  }
+
+  .img-placeholder {
+    @apply flex items-center justify-center border-2 border-dashed border-[#f5c518]/60 bg-[#f5c518]/5;
+    position: relative;
+  }
+
+  .img-placeholder::before {
+    content: '📷 DROP IMAGE HERE';
+    @apply text-[#f5c518]/70 text-xs font-bold uppercase tracking-widest text-center;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+}
+
+/* ── Animations ── */
 @keyframes fade-in-out {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.85; }
+  50%       { opacity: 1; }
 }
-
 .animate-fade-in-out {
   animation: fade-in-out 2s ease-in-out infinite;
 }
 
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out forwards;
+}
 
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0d1b3e; }
+::-webkit-scrollbar-thumb { background: #f5c518; }

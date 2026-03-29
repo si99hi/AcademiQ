@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
-import { Button } from "@/components/ui/button"
 
 const announcements = [
-  "Physics Quiz on Mechanics scheduled for 15th May",
-  "New study materials uploaded for Organic Chemistry",
-  "Live doubt-solving session tomorrow at 6 PM",
-  "JEE Main mock test available in the Test section",
+  "⚡ Physics Quiz on Mechanics scheduled for 15th May",
+  "⚗️ New study materials uploaded for Organic Chemistry",
+  "📅 Live doubt-solving session tomorrow at 6 PM",
+  "✏️ JEE Main mock test available in the Test section",
 ]
 
 export default function AnnouncementBar() {
@@ -19,27 +18,29 @@ export default function AnnouncementBar() {
     const interval = setInterval(() => {
       setCurrentAnnouncement((prev) => (prev + 1) % announcements.length)
     }, 5000)
-
     return () => clearInterval(interval)
   }, [])
 
   if (!visible) return null
 
   return (
-    <div className="bg-primary/90 text-white py-2 px-4 relative">
+    <div className="relative py-2.5 px-4" style={{ background: "#f5c518" }}>
       <div className="container mx-auto flex items-center justify-center">
-        <p className="text-center text-sm md:text-base animate-fade-in-out">{announcements[currentAnnouncement]}</p>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white hover:bg-white/10 p-1 h-auto"
+        <p
+          className="text-center text-sm font-bold animate-fade-in-out"
+          style={{ color: "#0d1b3e", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.05em", fontSize: "0.9rem" }}
+        >
+          {announcements[currentAnnouncement]}
+        </p>
+        <button
           onClick={() => setVisible(false)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
+          style={{ color: "#0d1b3e" }}
+          aria-label="Close"
         >
           <X size={16} />
-          <span className="sr-only">Close</span>
-        </Button>
+        </button>
       </div>
     </div>
   )
 }
-

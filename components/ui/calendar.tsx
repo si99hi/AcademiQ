@@ -13,6 +13,7 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  formatters,
   ...props
 }: CalendarProps) {
   return (
@@ -31,15 +32,15 @@ function Calendar({
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex justify-between w-full gap-1",
+        table: "w-full border-collapse",
+        head_row: "grid grid-cols-7 w-full",
         head_cell:
-          "text-muted-foreground rounded-md w-12 font-normal text-[0.8rem] flex items-center justify-center",
-        row: "flex justify-between w-full mt-2 gap-1",
-        cell: "relative h-12 w-12 flex items-center justify-center p-0 [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+          "text-muted-foreground rounded-md font-normal text-[0.8rem] w-full flex items-center justify-center py-1",
+        row: "grid grid-cols-7 w-full mt-1",
+        cell: "relative h-10 flex items-center justify-center p-0 [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-10 w-10 p-0 font-normal aria-selected:opacity-100"
+          "h-9 w-9 p-0 font-normal aria-selected:opacity-100"
         ),
         day_range_end: "day-range-end",
         day_selected:
@@ -53,9 +54,27 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
+      formatters={{
+        formatWeekdayName: (day) =>
+          day.toLocaleDateString("en-US", { weekday: "narrow" }),
+        ...formatters,
+      }}
       components={{
         IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        HeadRow: () => (
+          <tr className="grid grid-cols-7 w-full">
+            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+              <th
+                key={day}
+                className="text-muted-foreground rounded-md font-normal text-[0.8rem] w-full flex items-center justify-center py-1"
+                aria-label={day}
+              >
+                {day}
+              </th>
+            ))}
+          </tr>
+        ),
       }}
       {...props}
     />

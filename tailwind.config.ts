@@ -12,9 +12,7 @@ const config: Config = {
     container: {
       center: true,
       padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       colors: {
@@ -51,11 +49,27 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // EDUMINT custom palette
+        navy: {
+          DEFAULT: "#0d1b3e",
+          light: "#1a2d5a",
+          dark: "#080f24",
+        },
+        gold: {
+          DEFAULT: "#f5c518",
+          light: "#fdd835",
+          dark: "#c9a800",
+        },
+      },
+      fontFamily: {
+        condensed: ["Barlow Condensed", "sans-serif"],
+        sans: ["Inter", "sans-serif"],
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0",
+        md: "0",
+        sm: "0",
+        DEFAULT: "0",
       },
     },
   },
@@ -63,4 +77,3 @@ const config: Config = {
 }
 
 export default config
-
