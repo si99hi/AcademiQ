@@ -90,8 +90,13 @@ export default function Dashboard() {
 
       {/* ── HERO BANNER ── */}
       <div className="relative overflow-hidden" style={{ background: "#0d1b3e", minHeight: "180px" }}>
-        {/* Image placeholder */}
-        <div className="absolute inset-0 opacity-20 img-placeholder" style={{ minHeight: "180px" }} />
+        {/* Hardcoded background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/hero-bg.png')" }}
+        />
+        {/* Subtle blue overlay */}
+        <div className="absolute inset-0" style={{ background: "rgba(13,27,62,0.60)" }} />
 
         {/* Overlay content */}
         <div className="relative z-10 container mx-auto px-4 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

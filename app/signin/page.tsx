@@ -40,31 +40,31 @@ export default function SignInPage() {
       {/* ── LEFT PANEL — Image placeholder ── */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: "#0d1b3e" }}>
 
-        {/* Image placeholder — replace with <Image> when you provide the file */}
+        {/* Hardcoded background image */}
         <div
-          className="absolute inset-0 img-placeholder"
-          style={{
-            background: "linear-gradient(135deg, #0d1b3e 0%, #1a2d5a 60%, #0d1b3e 100%)",
-          }}
-        >
-          {/* Decorative dots pattern */}
-          <svg className="absolute top-12 right-12 opacity-20" width="120" height="120" viewBox="0 0 120 120">
-            {Array.from({ length: 36 }).map((_, i) => (
-              <circle key={i} cx={(i % 6) * 20 + 10} cy={Math.floor(i / 6) * 20 + 10} r="2" fill="#f5c518" />
-            ))}
-          </svg>
-          <svg className="absolute bottom-24 left-8 opacity-20" width="80" height="80" viewBox="0 0 80 80">
-            {Array.from({ length: 16 }).map((_, i) => (
-              <circle key={i} cx={(i % 4) * 20 + 10} cy={Math.floor(i / 4) * 20 + 10} r="2" fill="#f5c518" />
-            ))}
-          </svg>
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/hero-bg.png')" }}
+        />
+        {/* Navy-blue overlay */}
+        <div className="absolute inset-0" style={{ background: "rgba(13,27,62,0.72)" }} />
 
-          {/* Gold wavy accent */}
-          <svg className="absolute bottom-40 left-0 w-full opacity-30" viewBox="0 0 600 40" preserveAspectRatio="none">
-            <path d="M0,20 Q150,0 300,20 T600,20" stroke="#f5c518" strokeWidth="3" fill="none" />
-            <path d="M0,30 Q150,10 300,30 T600,30" stroke="#f5c518" strokeWidth="2" fill="none" />
-          </svg>
-        </div>
+        {/* Decorative dots pattern */}
+        <svg className="absolute top-12 right-12 opacity-20 z-10" width="120" height="120" viewBox="0 0 120 120">
+          {Array.from({ length: 36 }).map((_, i) => (
+            <circle key={i} cx={(i % 6) * 20 + 10} cy={Math.floor(i / 6) * 20 + 10} r="2" fill="#f5c518" />
+          ))}
+        </svg>
+        <svg className="absolute bottom-24 left-8 opacity-20 z-10" width="80" height="80" viewBox="0 0 80 80">
+          {Array.from({ length: 16 }).map((_, i) => (
+            <circle key={i} cx={(i % 4) * 20 + 10} cy={Math.floor(i / 4) * 20 + 10} r="2" fill="#f5c518" />
+          ))}
+        </svg>
+
+        {/* Gold wavy accent */}
+        <svg className="absolute bottom-40 left-0 w-full opacity-30 z-10" viewBox="0 0 600 40" preserveAspectRatio="none">
+          <path d="M0,20 Q150,0 300,20 T600,20" stroke="#f5c518" strokeWidth="3" fill="none" />
+          <path d="M0,30 Q150,10 300,30 T600,30" stroke="#f5c518" strokeWidth="2" fill="none" />
+        </svg>
 
         {/* Content overlay */}
         <div className="relative z-10 flex flex-col justify-between w-full p-12">

@@ -1,65 +1,75 @@
+"use client"
+
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import { useState, use } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChevronLeft, Video, FileText, PenTool } from "lucide-react"
+import { ChevronLeft, Video, FileText, PenTool, X } from "lucide-react"
 
-
-
-// Define the subject data
-// ──────────────────────────────────────────────────────────────────────────────
-// TO ADD PDFs: put your PDF files inside  public/pdfs/<subject>/<filename>.pdf
-// then update the `pdf` field below to match the filename.
-// Example: public/pdfs/physics/mechanics.pdf  →  pdf: "/pdfs/physics/mechanics.pdf"
-// ──────────────────────────────────────────────────────────────────────────────
 const subjects = {
   physics: {
     name: "Physics",
     description: "Master the fundamental laws of the physical world",
     chapters: [
-      { id: 1, title: "Mechanics",         completed: true,  pdf: "/pdfs/physics/mechanics.pdf" },
-      { id: 2, title: "Thermodynamics",    completed: true,  pdf: "/pdfs/physics/thermodynamics.pdf" },
-      { id: 3, title: "Electrostatics",    completed: false, pdf: "/pdfs/physics/electrostatics.pdf" },
-      { id: 4, title: "Current Electricity", completed: false, pdf: "/pdfs/physics/current-electricity.pdf" },
-      { id: 5, title: "Magnetism",         completed: false, pdf: "/pdfs/physics/magnetism.pdf" },
-      { id: 6, title: "Optics",            completed: false, pdf: "/pdfs/physics/optics.pdf" },
-      { id: 7, title: "Modern Physics",    completed: false, pdf: "/pdfs/physics/modern-physics.pdf" },
+      { id: 1, title: "Mechanics", completed: true, pdf: "/pdfs/physics/mechanics.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 2, title: "Thermodynamics", completed: true, pdf: "/pdfs/physics/thermodynamics.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 3, title: "Electrostatics", completed: false, pdf: "/pdfs/physics/electrostatics.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 4, title: "Current Electricity", completed: false, pdf: "/pdfs/physics/current-electricity.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 5, title: "Magnetism", completed: false, pdf: "/pdfs/physics/magnetism.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 6, title: "Optics", completed: false, pdf: "/pdfs/physics/optics.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 7, title: "Modern Physics", completed: false, pdf: "/pdfs/physics/modern-physics.pdf", videoId: "dQw4w9WgXcQ" },
     ],
   },
   chemistry: {
     name: "Chemistry",
     description: "Explore the composition, structure, and properties of matter",
     chapters: [
-      { id: 1, title: "Atomic Structure",    completed: true,  pdf: "/pdfs/chemistry/atomic-structure.pdf" },
-      { id: 2, title: "Chemical Bonding",    completed: true,  pdf: "/pdfs/chemistry/chemical-bonding.pdf" },
-      { id: 3, title: "States of Matter",    completed: false, pdf: "/pdfs/chemistry/states-of-matter.pdf" },
-      { id: 4, title: "Thermodynamics",      completed: false, pdf: "/pdfs/chemistry/thermodynamics.pdf" },
-      { id: 5, title: "Equilibrium",         completed: false, pdf: "/pdfs/chemistry/equilibrium.pdf" },
-      { id: 6, title: "Organic Chemistry",   completed: false, pdf: "/pdfs/chemistry/organic-chemistry.pdf" },
-      { id: 7, title: "Inorganic Chemistry", completed: false, pdf: "/pdfs/chemistry/inorganic-chemistry.pdf" },
+      { id: 1, title: "Atomic Structure", completed: true, pdf: "/pdfs/chemistry/atomic-structure.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 2, title: "Chemical Bonding", completed: true, pdf: "/pdfs/chemistry/chemical-bonding.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 3, title: "States of Matter", completed: false, pdf: "/pdfs/chemistry/states-of-matter.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 4, title: "Thermodynamics", completed: false, pdf: "/pdfs/chemistry/thermodynamics.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 5, title: "Equilibrium", completed: false, pdf: "/pdfs/chemistry/equilibrium.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 6, title: "Organic Chemistry", completed: false, pdf: "/pdfs/chemistry/organic-chemistry.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 7, title: "Inorganic Chemistry", completed: false, pdf: "/pdfs/chemistry/inorganic-chemistry.pdf", videoId: "dQw4w9WgXcQ" },
     ],
   },
   mathematics: {
     name: "Mathematics",
     description: "Develop problem-solving skills with advanced mathematical concepts",
     chapters: [
-      { id: 1, title: "Algebra",              completed: true,  pdf: "/pdfs/mathematics/algebra.pdf" },
-      { id: 2, title: "Calculus",             completed: true,  pdf: "/pdfs/mathematics/calculus.pdf" },
-      { id: 3, title: "Coordinate Geometry",  completed: false, pdf: "/pdfs/mathematics/coordinate-geometry.pdf" },
-      { id: 4, title: "Trigonometry",         completed: false, pdf: "/pdfs/mathematics/trigonometry.pdf" },
-      { id: 5, title: "Vectors",              completed: false, pdf: "/pdfs/mathematics/vectors.pdf" },
-      { id: 6, title: "Probability",          completed: false, pdf: "/pdfs/mathematics/probability.pdf" },
-      { id: 7, title: "Statistics",           completed: false, pdf: "/pdfs/mathematics/statistics.pdf" },
+      { id: 1, title: "Algebra", completed: true, pdf: "/pdfs/mathematics/algebra.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 2, title: "Calculus", completed: true, pdf: "/pdfs/mathematics/calculus.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 3, title: "Coordinate Geometry", completed: false, pdf: "/pdfs/mathematics/coordinate-geometry.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 4, title: "Trigonometry", completed: false, pdf: "/pdfs/mathematics/trigonometry.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 5, title: "Vectors", completed: false, pdf: "/pdfs/mathematics/vectors.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 6, title: "Probability", completed: false, pdf: "/pdfs/mathematics/probability.pdf", videoId: "dQw4w9WgXcQ" },
+      { id: 7, title: "Statistics", completed: false, pdf: "/pdfs/mathematics/statistics.pdf", videoId: "dQw4w9WgXcQ" },
     ],
   },
 }
 
-export default function SubjectPage({ params }: { params: { subject: string } }) {
-  const subject = subjects[params.subject as keyof typeof subjects]
+export default function SubjectPage({ params }: { params: Promise<{ subject: string }> }) {
+  const { subject: subjectKey } = use(params)
+  const subject = subjects[subjectKey as keyof typeof subjects]
+
+  // Track which chapter's video is currently open (null = none)
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null)
+  const [activeVideoTitle, setActiveVideoTitle] = useState<string>("")
 
   if (!subject) {
     notFound()
+  }
+
+  const openVideo = (videoId: string, title: string) => {
+    setActiveVideoId(videoId)
+    setActiveVideoTitle(title)
+  }
+
+  const closeVideo = () => {
+    setActiveVideoId(null)
+    setActiveVideoTitle("")
   }
 
   return (
@@ -177,24 +187,57 @@ export default function SubjectPage({ params }: { params: { subject: string } })
                   </TabsContent>
 
                   <TabsContent value="videos" className="space-y-4">
-                    {subject.chapters.slice(0, 4).map((chapter) => (
-                      <div key={chapter.id} className="p-3 rounded-lg border hover:bg-secondary/50 transition-colors">
-                        <h3 className="font-medium flex items-center">
-                          <Video size={16} className="mr-2 text-primary" />
-                          {chapter.title} Video Lectures
-                        </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Video explanations with visual demonstrations
-                        </p>
-                        <div className="flex gap-2 mt-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="text-primary border-primary/30 hover:bg-secondary"
-                          >
-                            Watch
-                          </Button>
+                    {subject.chapters.map((chapter) => (
+                      <div key={chapter.id} className="rounded-lg border overflow-hidden">
+                        {/* Card header row */}
+                        <div className="p-3 hover:bg-secondary/50 transition-colors">
+                          <h3 className="font-medium flex items-center">
+                            <Video size={16} className="mr-2 text-primary" />
+                            {chapter.title} Video Lectures
+                          </h3>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Video explanations with visual demonstrations
+                          </p>
+                          <div className="flex gap-2 mt-2">
+                            {activeVideoId === chapter.videoId && activeVideoTitle === chapter.title ? (
+                              // Close button when this video is open
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-red-500 border-red-300 hover:bg-red-50 flex items-center gap-1"
+                                onClick={closeVideo}
+                              >
+                                <X size={14} />
+                                Close
+                              </Button>
+                            ) : (
+                              // Watch button
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-primary border-primary/30 hover:bg-secondary"
+                                onClick={() => openVideo(chapter.videoId, chapter.title)}
+                              >
+                                Watch
+                              </Button>
+                            )}
+                          </div>
                         </div>
+
+                        {/* Inline YouTube embed — shown only when this chapter is active */}
+                        {activeVideoId === chapter.videoId && activeVideoTitle === chapter.title && (
+                          <div className="border-t bg-black">
+                            <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+                              <iframe
+                                className="absolute inset-0 w-full h-full"
+                                src={`https://www.youtube.com/embed/${chapter.videoId}?autoplay=1&rel=0`}
+                                title={`${chapter.title} Video Lecture`}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowFullScreen
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </TabsContent>
@@ -225,9 +268,5 @@ export default function SubjectPage({ params }: { params: { subject: string } })
         </div>
       </main>
     </div>
-
-
-
   )
 }
-
