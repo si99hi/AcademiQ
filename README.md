@@ -1,4 +1,8 @@
 
+# AcademiQ
+
+A simple educational LMS for **Chemistry, Physics, and Mathematics**.
+
 ## Features
 - Nodemailer-based login/authentication  
 - View subject-wise notes (PDFs)  
