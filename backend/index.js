@@ -25,7 +25,7 @@ app.use('/api/courses', courseRoutes);
 
 // MongoDB connection
 const dbName = process.env.MONGO_DB || "localhost2027";
-const mongoUri = `mongodb://127.0.0.1:27017/${dbName}`;
+const mongoUri = process.env.MONGO_URI || `mongodb://127.0.0.1:27017/${dbName}`;
 
 mongoose.connect(mongoUri)
 .then(() => {
