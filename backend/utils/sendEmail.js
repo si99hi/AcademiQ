@@ -1,11 +1,6 @@
 import nodemailer from "nodemailer";
 import dns from "dns";
 
-/** Force IPv4 — avoids ENETUNREACH when Node picks Gmail's IPv6 (common on Render). */
-function lookupIPv4(hostname, _options, callback) {
-  dns.lookup(hostname, { family: 4, all: false }, callback);
-}
-
 /**
  * Gmail app passwords: 16 characters, no spaces.
  * Strips spaces (Google shows "xxxx xxxx ...") and accidental quotes from .env.
@@ -18,42 +13,44 @@ function normalizeAppPassword(pass) {
 
 const TIMEOUT_MS = 45_000;
 
+/** Connect by IPv4 literal so TLS never dials Gmail's IPv6 (Render often breaks IPv6 SMTP). */
+async function smtpGmailIPv4Host() {
+  const { address } = await dns.promises.lookup("smtp.gmail.com", { family: 4 });
+  return address;
+}
+
 function baseOpts(user, pass) {
   return {
     auth: { user, pass },
-    lookup: lookupIPv4,
     connectionTimeout: TIMEOUT_MS,
     greetingTimeout: TIMEOUT_MS,
     socketTimeout: TIMEOUT_MS,
     pool: false,
+    // When host is an IP, TLS must still present this name for the cert + SNI.
+    tls: {
+      servername: "smtp.gmail.com",
+      rejectUnauthorized: true,
+      minVersion: "TLSv1.2",
+    },
   };
 }
 
-function transport587(user, pass) {
+function transport587(host, user, pass) {
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host,
     port: 587,
     secure: false,
     requireTLS: true,
     ...baseOpts(user, pass),
-    tls: {
-      rejectUnauthorized: true,
-      minVersion: "TLSv1.2",
-      servername: "smtp.gmail.com",
-    },
   });
 }
 
-function transport465(user, pass) {
+function transport465(host, user, pass) {
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
+    host,
     port: 465,
     secure: true,
     ...baseOpts(user, pass),
-    tls: {
-      rejectUnauthorized: true,
-      minVersion: "TLSv1.2",
-    },
   });
 }
 
@@ -82,6 +79,15 @@ const sendEmail = async (options) => {
     return { ok: false, error: "missing_credentials" };
   }
 
+  let host;
+  try {
+    host = await smtpGmailIPv4Host();
+    console.log(`sendEmail: Gmail SMTP via IPv4 ${host}`);
+  } catch (e) {
+    console.error("sendEmail: IPv4 lookup failed:", e?.message || e);
+    return { ok: false, error: "dns_lookup_failed" };
+  }
+
   const mailOptions = {
     from: `"AcademiQ" <${user}>`,
     to: options.email,
@@ -89,7 +95,7 @@ const sendEmail = async (options) => {
     text: options.message,
   };
 
-  const try587 = transport587(user, pass);
+  const try587 = transport587(host, user, pass);
   try {
     const info = await try587.sendMail(mailOptions);
     console.log(`Email sent (587) to ${options.email}`, info.messageId || "");
@@ -101,7 +107,7 @@ const sendEmail = async (options) => {
     }
   }
 
-  const try465 = transport465(user, pass);
+  const try465 = transport465(host, user, pass);
   try {
     const info = await try465.sendMail(mailOptions);
     console.log(`Email sent (465) to ${options.email}`, info.messageId || "");
