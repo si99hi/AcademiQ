@@ -13,7 +13,3 @@ A simple educational LMS for **Chemistry, Physics, and Mathematics**.
 ![Preview 4](components/assets/Screenshot%202026-03-29%20171805.png)
 ![Preview 5](components/assets/Screenshot%202026-03-29%20171826.png)
 
-## Run
-```bash
-npm install
-npm run dev
