@@ -1,4 +1,10 @@
 import nodemailer from "nodemailer";
+import dns from "dns";
+
+/** Force IPv4 — avoids ENETUNREACH when Node picks Gmail's IPv6 (common on Render). */
+function lookupIPv4(hostname, _options, callback) {
+  dns.lookup(hostname, { family: 4, all: false }, callback);
+}
 
 /**
  * Gmail app passwords: 16 characters, no spaces.
@@ -26,7 +32,7 @@ function createTransport() {
     port: 465,
     secure: true,
     auth: { user, pass },
-    family: 4,
+    lookup: lookupIPv4,
     connectionTimeout: 20_000,
     greetingTimeout: 20_000,
     socketTimeout: 25_000,

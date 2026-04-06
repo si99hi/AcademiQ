@@ -2,6 +2,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import dns from 'dns';
+
+// Prefer IPv4 for outbound connections (Render often has no usable IPv6 route to Gmail SMTP).
+if (typeof dns.setDefaultResultOrder === 'function') {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 // Import routes
 import eventRoutes from './routes/eventRoutes.js';
