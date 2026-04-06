@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import dns from "dns";
+import net from "net";
 
 /**
  * Gmail app passwords: 16 characters, no spaces.
@@ -13,9 +14,20 @@ function normalizeAppPassword(pass) {
 
 const TIMEOUT_MS = 45_000;
 
-/** Connect by IPv4 literal so TLS never dials Gmail's IPv6 (Render often breaks IPv6 SMTP). */
-async function smtpGmailIPv4Host() {
+const GMAIL_TLS = {
+  servername: "smtp.gmail.com",
+  rejectUnauthorized: true,
+  minVersion: "TLSv1.2",
+};
+
+/**
+ * One IPv4 address only — avoids Nodemailer’s IPv4+IPv6 list + random pick + fallback to IPv6 (ENETUNREACH on Render).
+ */
+async function smtpGmailIPv4Only() {
   const { address } = await dns.promises.lookup("smtp.gmail.com", { family: 4 });
+  if (!net.isIPv4(address)) {
+    throw new Error(`Expected IPv4 from lookup, got: ${address}`);
+  }
   return address;
 }
 
@@ -26,13 +38,20 @@ function baseOpts(user, pass) {
     greetingTimeout: TIMEOUT_MS,
     socketTimeout: TIMEOUT_MS,
     pool: false,
-    // When host is an IP, TLS must still present this name for the cert + SNI.
-    tls: {
-      servername: "smtp.gmail.com",
-      rejectUnauthorized: true,
-      minVersion: "TLSv1.2",
-    },
+    // Required when connecting by IP — Nodemailer sets SNI / cert check from this + tls.
+    servername: "smtp.gmail.com",
+    tls: GMAIL_TLS,
   };
+}
+
+/** Port 465 first — direct TLS; some networks block 587 before 465 or vice versa. */
+function transport465(host, user, pass) {
+  return nodemailer.createTransport({
+    host,
+    port: 465,
+    secure: true,
+    ...baseOpts(user, pass),
+  });
 }
 
 function transport587(host, user, pass) {
@@ -41,15 +60,6 @@ function transport587(host, user, pass) {
     port: 587,
     secure: false,
     requireTLS: true,
-    ...baseOpts(user, pass),
-  });
-}
-
-function transport465(host, user, pass) {
-  return nodemailer.createTransport({
-    host,
-    port: 465,
-    secure: true,
     ...baseOpts(user, pass),
   });
 }
@@ -81,8 +91,8 @@ const sendEmail = async (options) => {
 
   let host;
   try {
-    host = await smtpGmailIPv4Host();
-    console.log(`sendEmail: Gmail SMTP via IPv4 ${host}`);
+    host = await smtpGmailIPv4Only();
+    console.log(`sendEmail: using Gmail SMTP IPv4 ${host} (no IPv6 fallback)`);
   } catch (e) {
     console.error("sendEmail: IPv4 lookup failed:", e?.message || e);
     return { ok: false, error: "dns_lookup_failed" };
@@ -95,18 +105,6 @@ const sendEmail = async (options) => {
     text: options.message,
   };
 
-  const try587 = transport587(host, user, pass);
-  try {
-    const info = await try587.sendMail(mailOptions);
-    console.log(`Email sent (587) to ${options.email}`, info.messageId || "");
-    return { ok: true };
-  } catch (err587) {
-    console.error("sendEmail 587 failed:", err587?.message || err587);
-    if (!isConnError(err587)) {
-      return { ok: false, error: err587?.message || "smtp_failed" };
-    }
-  }
-
   const try465 = transport465(host, user, pass);
   try {
     const info = await try465.sendMail(mailOptions);
@@ -114,7 +112,19 @@ const sendEmail = async (options) => {
     return { ok: true };
   } catch (err465) {
     console.error("sendEmail 465 failed:", err465?.message || err465);
-    return { ok: false, error: err465?.message || "smtp_failed" };
+    if (!isConnError(err465)) {
+      return { ok: false, error: err465?.message || "smtp_failed" };
+    }
+  }
+
+  const try587 = transport587(host, user, pass);
+  try {
+    const info = await try587.sendMail(mailOptions);
+    console.log(`Email sent (587) to ${options.email}`, info.messageId || "");
+    return { ok: true };
+  } catch (err587) {
+    console.error("sendEmail 587 failed:", err587?.message || err587);
+    return { ok: false, error: err587?.message || "smtp_failed" };
   }
 };
 
