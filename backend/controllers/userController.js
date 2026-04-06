@@ -34,12 +34,18 @@ export const registerUser = async (req, res) => {
         }
         await userExists.save();
 
-        await sendEmail({
+        const mailResult = await sendEmail({
           email: userExists.email,
           subject: 'Verify your AcademiQ account',
           message: `Your verification OTP is: ${otp}\nThis code is valid for 10 minutes.`
         });
-        return res.status(200).json({ message: 'User exists but not verified. New OTP sent to email', email: userExists.email });
+        return res.status(200).json({
+          message: mailResult.ok
+            ? 'User exists but not verified. New OTP sent to email'
+            : 'Account updated, but the verification email could not be sent. Try Resend OTP or check server email settings.',
+          email: userExists.email,
+          emailSent: mailResult.ok,
+        });
       }
       return res.status(400).json({ message: 'User already exists and is verified' });
     }
@@ -62,19 +68,18 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
-      try {
-        await sendEmail({
-          email: user.email,
-          subject: 'AcademiQ - Account Verification',
-          message: `Hello ${user.firstName},\n\nWelcome to AcademiQ! Your verification OTP is: ${otp}\nThis code is valid for 10 minutes.\n\nBest regards,\nAcademiQ Team`
-        });
-      } catch (err) {
-        console.error('Failed to send OTP email', err);
-      }
+      const mailResult = await sendEmail({
+        email: user.email,
+        subject: 'AcademiQ - Account Verification',
+        message: `Hello ${user.firstName},\n\nWelcome to AcademiQ! Your verification OTP is: ${otp}\nThis code is valid for 10 minutes.\n\nBest regards,\nAcademiQ Team`
+      });
 
       res.status(201).json({
-        message: 'User registered. Please check email for OTP verification.',
-        email: user.email
+        message: mailResult.ok
+          ? 'User registered. Please check email for OTP verification.'
+          : 'Account created, but the verification email could not be sent. Use Resend OTP after fixing SMTP, or contact support.',
+        email: user.email,
+        emailSent: mailResult.ok,
       });
     }
   } catch (error) {
@@ -165,19 +170,18 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: 'AcademiQ - Password Reset OTP',
-        message: `Hello ${user.firstName},\n\nYou requested a password reset. Your OTP is: ${otp}\nThis code is valid for 10 minutes.\nIf you did not request this, please ignore this email.`
-      });
-      res.status(200).json({ message: 'Password reset OTP sent to email' });
-    } catch (err) {
+    const mailResult = await sendEmail({
+      email: user.email,
+      subject: 'AcademiQ - Password Reset OTP',
+      message: `Hello ${user.firstName},\n\nYou requested a password reset. Your OTP is: ${otp}\nThis code is valid for 10 minutes.\nIf you did not request this, please ignore this email.`
+    });
+    if (!mailResult.ok) {
       user.resetPasswordOtp = undefined;
       user.resetPasswordExpire = undefined;
       await user.save();
-      return res.status(500).json({ message: 'Email could not be sent' });
+      return res.status(500).json({ message: 'Email could not be sent. Check SMTP settings on the server.' });
     }
+    res.status(200).json({ message: 'Password reset OTP sent to email' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

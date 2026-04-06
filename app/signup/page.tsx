@@ -30,8 +30,13 @@ export default function SignUpPage() {
     setError("");
     try {
       const data = await apiRegister(form);
-      if (data.email || data.message?.includes("registered")) {
+      if (data?.email) {
         sessionStorage.setItem("pendingVerifyEmail", form.email);
+        if (data.emailSent === false) {
+          sessionStorage.setItem("emailDeliveryFailed", "1");
+        } else {
+          sessionStorage.removeItem("emailDeliveryFailed");
+        }
         router.push("/verify-email");
       } else {
         setError(data.message || "Registration failed. Please try again.");

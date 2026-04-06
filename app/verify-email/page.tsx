@@ -15,6 +15,7 @@ export default function VerifyEmailPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [countdown, setCountdown] = useState(60);
+  const [deliveryWarning, setDeliveryWarning] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -24,6 +25,9 @@ export default function VerifyEmailPage() {
       return;
     }
     setEmail(pendingEmail);
+    if (sessionStorage.getItem("emailDeliveryFailed") === "1") {
+      setDeliveryWarning(true);
+    }
     inputRefs.current[0]?.focus();
   }, [router]);
 
@@ -88,7 +92,7 @@ export default function VerifyEmailPage() {
     setResending(true);
     setError("");
     try {
-      await apiRegister({
+      const data = await apiRegister({
         username: "_resend_" + Date.now(),
         email,
         password: "placeholder",
@@ -96,8 +100,18 @@ export default function VerifyEmailPage() {
         lastName: "",
       });
       setCountdown(60);
-      setSuccess("New OTP sent! Check your inbox.");
-      setTimeout(() => setSuccess(""), 3000);
+      if (data.emailSent === false) {
+        sessionStorage.setItem("emailDeliveryFailed", "1");
+        setDeliveryWarning(true);
+        setError(
+          "We could not send the email from the server (often SMTP blocked on cloud hosts). Check Render logs or use an email API (e.g. Resend)."
+        );
+      } else {
+        sessionStorage.removeItem("emailDeliveryFailed");
+        setDeliveryWarning(false);
+        setSuccess("New OTP sent! Check your inbox.");
+        setTimeout(() => setSuccess(""), 3000);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to resend OTP.");
     } finally {
@@ -125,6 +139,13 @@ export default function VerifyEmailPage() {
             We sent a 6-digit OTP to{" "}
             <span className="font-semibold text-gray-700">{email}</span>
           </p>
+
+          {deliveryWarning && (
+            <div className="mt-4 p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-sm text-left">
+              The server could not deliver the email (SMTP timeout or blocked). Your account is still saved — use{" "}
+              <strong>Resend OTP</strong> after fixing email on Render, or check spam. Hosts like Render often block Gmail SMTP; consider Resend/SendGrid over HTTPS.
+            </div>
+          )}
 
           {error && (
             <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">

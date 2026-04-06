@@ -16,27 +16,40 @@ function normalizeAppPassword(pass) {
   return p.replace(/\s+/g, "");
 }
 
-function createTransport() {
-  const user = process.env.EMAIL_USER?.trim();
-  const pass = normalizeAppPassword(process.env.EMAIL_PASS);
+const TIMEOUT_MS = 45_000;
 
-  if (!user || !pass) {
-    console.error("sendEmail: missing EMAIL_USER or EMAIL_PASS");
-    return null;
-  }
+function baseOpts(user, pass) {
+  return {
+    auth: { user, pass },
+    lookup: lookupIPv4,
+    connectionTimeout: TIMEOUT_MS,
+    greetingTimeout: TIMEOUT_MS,
+    socketTimeout: TIMEOUT_MS,
+    pool: false,
+  };
+}
 
-  // Explicit SMTP — more predictable than service: "gmail" on cloud hosts.
-  // family: 4 forces IPv4; many VPS/containers have broken IPv6 routes to Google SMTP.
+function transport587(user, pass) {
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    ...baseOpts(user, pass),
+    tls: {
+      rejectUnauthorized: true,
+      minVersion: "TLSv1.2",
+      servername: "smtp.gmail.com",
+    },
+  });
+}
+
+function transport465(user, pass) {
   return nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
     secure: true,
-    auth: { user, pass },
-    lookup: lookupIPv4,
-    connectionTimeout: 20_000,
-    greetingTimeout: 20_000,
-    socketTimeout: 25_000,
-    pool: false,
+    ...baseOpts(user, pass),
     tls: {
       rejectUnauthorized: true,
       minVersion: "TLSv1.2",
@@ -44,31 +57,58 @@ function createTransport() {
   });
 }
 
+function isConnError(err) {
+  const c = err?.code;
+  return (
+    c === "ETIMEDOUT" ||
+    c === "ECONNREFUSED" ||
+    c === "ECONNRESET" ||
+    c === "ECONNABORTED" ||
+    c === "ENOTFOUND" ||
+    c === "ENETUNREACH" ||
+    c === "ESOCKET"
+  );
+}
+
+/**
+ * @returns {Promise<{ ok: boolean, error?: string }>}
+ */
 const sendEmail = async (options) => {
-  const transporter = createTransport();
-  if (!transporter) return;
+  const user = process.env.EMAIL_USER?.trim();
+  const pass = normalizeAppPassword(process.env.EMAIL_PASS);
 
+  if (!user || !pass) {
+    console.error("sendEmail: missing EMAIL_USER or EMAIL_PASS");
+    return { ok: false, error: "missing_credentials" };
+  }
+
+  const mailOptions = {
+    from: `"AcademiQ" <${user}>`,
+    to: options.email,
+    subject: options.subject,
+    text: options.message,
+  };
+
+  const try587 = transport587(user, pass);
   try {
-    const mailOptions = {
-      from: `"AcademiQ" <${process.env.EMAIL_USER}>`,
-      to: options.email,
-      subject: options.subject,
-      text: options.message,
-    };
+    const info = await try587.sendMail(mailOptions);
+    console.log(`Email sent (587) to ${options.email}`, info.messageId || "");
+    return { ok: true };
+  } catch (err587) {
+    console.error("sendEmail 587 failed:", err587?.message || err587);
+    if (!isConnError(err587)) {
+      return { ok: false, error: err587?.message || "smtp_failed" };
+    }
+  }
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${options.email}`, info.messageId || "");
-  } catch (error) {
-    console.error("sendEmail failed:", error?.message || error);
-    if (error?.response) {
-      console.error("SMTP response:", error.response);
-    }
-    if (error?.code) {
-      console.error("SMTP code:", error.code);
-    }
-    if (error?.command) {
-      console.error("SMTP command:", error.command);
-    }
+  const try465 = transport465(user, pass);
+  try {
+    const info = await try465.sendMail(mailOptions);
+    console.log(`Email sent (465) to ${options.email}`, info.messageId || "");
+    return { ok: true };
+  } catch (err465) {
+    console.error("sendEmail 465 failed:", err465?.message || err465);
+    return { ok: false, error: err465?.message || "smtp_failed" };
   }
 };
 
