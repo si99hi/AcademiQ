@@ -13,23 +13,44 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-const allowedOrigins = (process.env.FRONTEND_URLS || "")
+// Middleware — CORS (browser preflight must get Access-Control-Allow-Origin)
+function normalizeOrigin(url) {
+  if (!url || typeof url !== "string") return "";
+  return url.trim().replace(/\/+$/, "");
+}
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URLS,
+]
+  .filter(Boolean)
+  .join(",")
   .split(",")
-  .map((origin) => origin.trim())
+  .map(normalizeOrigin)
   .filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow non-browser requests and local development by default.
-      if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error(`CORS blocked for origin: ${origin}`));
-    },
-  })
-);
+const corsOptions = {
+  origin(origin, callback) {
+    // curl / Postman / same-machine: no Origin header
+    if (!origin) {
+      return callback(null, true);
+    }
+    const reqOrigin = normalizeOrigin(origin);
+    if (allowedOrigins.length === 0) {
+      return callback(null, true);
+    }
+    if (allowedOrigins.includes(reqOrigin)) {
+      return callback(null, true);
+    }
+    console.warn(`CORS: blocked origin "${reqOrigin}". Allowed: ${allowedOrigins.join(", ")}`);
+    return callback(null, false);
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
