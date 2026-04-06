@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiLogin } from "@/lib/auth";
-import { Eye, EyeOff, BookOpen } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
+import { AuthBrandPanel, AuthMobileLogo, AuthSubjectsStrip } from "@/components/auth-brand-panel";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -37,80 +38,13 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen flex" style={{ fontFamily: "'Inter', sans-serif" }}>
 
-      {/* ── LEFT PANEL — Image placeholder ── */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ backgroundColor: "#0d1b3e" }}>
-
-        {/* Hardcoded background image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/hero-bg.png')" }}
-        />
-        {/* Navy-blue overlay */}
-        <div className="absolute inset-0" style={{ background: "rgba(13,27,62,0.72)" }} />
-
-        {/* Decorative dots pattern */}
-        <svg className="absolute top-12 right-12 opacity-20 z-10" width="120" height="120" viewBox="0 0 120 120">
-          {Array.from({ length: 36 }).map((_, i) => (
-            <circle key={i} cx={(i % 6) * 20 + 10} cy={Math.floor(i / 6) * 20 + 10} r="2" fill="#f5c518" />
-          ))}
-        </svg>
-        <svg className="absolute bottom-24 left-8 opacity-20 z-10" width="80" height="80" viewBox="0 0 80 80">
-          {Array.from({ length: 16 }).map((_, i) => (
-            <circle key={i} cx={(i % 4) * 20 + 10} cy={Math.floor(i / 4) * 20 + 10} r="2" fill="#f5c518" />
-          ))}
-        </svg>
-
-        {/* Gold wavy accent */}
-        <svg className="absolute bottom-40 left-0 w-full opacity-30 z-10" viewBox="0 0 600 40" preserveAspectRatio="none">
-          <path d="M0,20 Q150,0 300,20 T600,20" stroke="#f5c518" strokeWidth="3" fill="none" />
-          <path d="M0,30 Q150,10 300,30 T600,30" stroke="#f5c518" strokeWidth="2" fill="none" />
-        </svg>
-
-        {/* Content overlay */}
-        <div className="relative z-10 flex flex-col justify-between w-full p-12">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="p-2" style={{ background: "#f5c518" }}>
-              <BookOpen className="w-6 h-6" style={{ color: "#0d1b3e" }} />
-            </div>
-            <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "1.5rem", color: "#fff", letterSpacing: "0.06em" }}>
-              ACADEMIQ
-            </span>
-          </div>
-
-          {/* Hero text */}
-          <div className="mb-16">
-            <p className="section-label mb-4">PLACE TO GROW</p>
-            <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "3.2rem", lineHeight: 1.05, color: "#fff" }}>
-              WE CREATING<br />LEADERS FOR<br />TOMORROW
-            </h1>
-            <p className="mt-4 text-white/70 text-sm leading-relaxed max-w-xs">
-              Master Physics, Chemistry &amp; Mathematics with expert-curated content built for JEE success.
-            </p>
-
-            <div className="flex gap-3 mt-8">
-              {["10k+ Problems", "Expert Faculty", "AI Analytics"].map((f) => (
-                <div key={f} className="flex items-center gap-2 text-white/80 text-xs">
-                  <div className="w-1.5 h-1.5 flex-shrink-0" style={{ background: "#f5c518" }} />
-                  {f}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <AuthBrandPanel />
 
       {/* ── RIGHT PANEL — Form ── */}
       <div className="flex-1 flex items-center justify-center px-6 py-12" style={{ background: "#f5f6f8" }}>
         <div className="w-full max-w-md">
 
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="p-1.5" style={{ background: "#f5c518" }}>
-              <BookOpen className="w-5 h-5" style={{ color: "#0d1b3e" }} />
-            </div>
-            <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "#0d1b3e" }}>ACADEMIQ</span>
-          </div>
+          <AuthMobileLogo />
 
           {/* Card */}
           <div className="bg-white shadow-xl border-0 overflow-hidden">
@@ -216,19 +150,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Subjects strip */}
-          <div className="mt-6 grid grid-cols-3 gap-2">
-            {[
-              { label: "Physics", icon: "⚡" },
-              { label: "Chemistry", icon: "⚗️" },
-              { label: "Mathematics", icon: "∑" },
-            ].map(({ label, icon }) => (
-              <div key={label} className="text-center py-3" style={{ background: "#0d1b3e" }}>
-                <div className="text-lg">{icon}</div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/70 mt-0.5">{label}</p>
-              </div>
-            ))}
-          </div>
+          <AuthSubjectsStrip />
         </div>
       </div>
     </div>
