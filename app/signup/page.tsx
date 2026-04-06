@@ -36,8 +36,8 @@ export default function SignUpPage() {
       } else {
         setError(data.message || "Registration failed. Please try again.");
       }
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

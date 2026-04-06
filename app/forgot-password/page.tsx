@@ -28,8 +28,8 @@ export default function ForgotPasswordPage() {
       } else {
         setError(data.message || "Something went wrong.");
       }
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -71,8 +71,8 @@ export default function ResetPasswordPage() {
       } else {
         setError(data.message || "Reset failed. OTP may be expired.");
       }
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

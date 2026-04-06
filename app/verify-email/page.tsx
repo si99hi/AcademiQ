@@ -76,8 +76,8 @@ export default function VerifyEmailPage() {
       } else {
         setError(data.message || "Invalid or expired OTP. Please try again.");
       }
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -98,8 +98,8 @@ export default function VerifyEmailPage() {
       setCountdown(60);
       setSuccess("New OTP sent! Check your inbox.");
       setTimeout(() => setSuccess(""), 3000);
-    } catch {
-      setError("Failed to resend OTP.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend OTP.");
     } finally {
       setResending(false);
     }
